@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <!-- HTTP Listener Configuration -->
+
+    <!-- Main API Flow -->
+    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="23c61776-6bdc-4f82-a2eb-a2a2579f9f58" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="ecommerce-product-sync-apiFlow">
+        <http:listener doc:name="Listener" config-ref="HTTP_Listener_config" path="/api/products"/>
+        
+        <!-- Router to handle GET and POST requests -->
+        <choice doc:name="Router">
+            <when expression="#[message.inboundProperties.'http.method' == 'GET']">
+                <!-- Fetch products logic -->
+                <set-payload value="#[[
+                  { id: 1, name: 'Product 1', price: 99.99 },
+                  { id: 2, name: 'Product 2', price: 149.99 }
+                ]]" doc:name="Set Payload"/>
+            </when>
+            <when expression="#[message.inboundProperties.'http.method' == 'POST']">
+                <!-- Create or update product logic -->
+                <set-payload value="#[{ status: 'Product created/updated successfully' }]" doc:name="Set Payload"/>
+            </when>
+            <otherwise>
+                <set-payload value="#[{ status: 'Unsupported method' }]" doc:name="Set Payload"/>
+                <set-property propertyName="http.status" value="405" doc:name="Set Status"/>
+            </otherwise>
+        </choice>
+    </flow>
+
+</mule>
