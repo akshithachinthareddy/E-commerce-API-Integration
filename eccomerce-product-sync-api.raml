@@ -1,0 +1,36 @@
+#%RAML 1.0
+title: E-commerce Product Sync API
+version: 1.0
+baseUri: http://localhost:8081/api
+
+/products:
+  get:
+    description: Get all products from the ERP system
+    responses:
+      200:
+        body:
+          application/json:
+            type: array
+            items:
+              type: object
+              properties:
+                id: integer
+                name: string
+                price: number
+
+  post:
+    description: Create or update a product in the ERP system
+    body:
+      application/json:
+        type: object
+        properties:
+          id: integer
+          name: string
+          price: number
+    responses:
+      201:
+        body:
+          application/json:
+            type: object
+            properties:
+              status: string
